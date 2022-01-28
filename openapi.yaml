@@ -1,0 +1,479 @@
+openapi: "3.0.0"
+info:
+  description: "Description of the Flatly API"
+  version: "1.0.0"
+  title: "Flatly API"
+  contact:
+    url: https://github.com/pwmini2021/flatly
+
+host: "https://spring-app-lab.azurewebsites.net"
+basePath: "/api"
+tags:
+  - name: "flat"
+    description: "Everything about flats"
+
+  - name: "booking"
+    description: "Bookings of flats"
+
+schemes:
+  - "https"
+  - "http"
+
+paths:
+  /auth:
+    get:
+      tags:
+        - security
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  username:
+                    type: "string"
+                  authorities:
+                    type: "array"
+                    items:
+                      type: "string"
+                      
+    post:
+      tags:
+        - security
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  token:
+                    type: "string"
+
+  /flats:
+    get:
+      tags:
+        - flat
+      summary: "Get list of flats"
+      parameters:
+        - in: "query"
+          name: "page"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "limit"
+          description: Amount of results per page
+          schema:
+            type: "integer"
+            default: 10
+        - in: query
+          name: location
+          description: Filter by flat location
+          schema:
+            type: string
+        - in: query
+          name: name
+          description: Filter by flat name
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Flat"
+    post:
+      tags:
+        - flat
+      summary: "Add a new flat"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Flat"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Flat"
+
+  /flats/{flatId}:
+    get:
+      tags:
+        - flat
+      summary: "Get a flat"
+      parameters:
+        - in: "path"
+          name: "flatId"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Flat"
+    put:
+      tags:
+        - flat
+      summary: "Update an existing flat"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Flat"
+      parameters:
+        - in: "path"
+          name: "flatId"
+          description: "ID flat to modify"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Flat"
+        "404":
+          description: Flat not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FailResponse"
+    delete:
+      tags:
+        - flat
+      summary: "Delete an existing flat"
+      parameters:
+        - in: "path"
+          name: "flatId"
+          description: "ID flat to delete"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Flat not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FailResponse"
+
+  /bookings:
+    get:
+      tags:
+        - booking
+      summary: "Get list of bookings"
+      parameters:
+        - in: "query"
+          name: "page"
+          required: true
+          schema:
+            type: "integer"
+        - in: "query"
+          name: "limit"
+          description: Amount of results per page
+          schema:
+            type: "integer"
+            default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      tags:
+        - booking
+      summary: "Add a new booking"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Booking"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{bookingId}:
+    get:
+      tags:
+        - booking
+      summary: "Get a booking"
+      parameters:
+        - in: "path"
+          name: "bookingId"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+    delete:
+      tags:
+        - booking
+      summary: "Delete an existing booking"
+      parameters:
+        - in: "path"
+          name: "bookingId"
+          description: "IDof booking to delete"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Flat not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FailResponse"
+                
+  /images:
+    post:
+      tags:
+        - images
+      summary: "upload an image"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                file:
+                  type: "string"
+                  format: binary
+                  description: "the file that is being uploaded"
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageMetadata"
+                
+  /images/{imageId}:
+    get:
+      tags:
+        - images
+      summary: "download an image"
+      parameters:
+        - in: "path"
+          name: "imageId"
+          description: "id of image to download"
+          required: true
+          schema:
+            type: "string"
+            format: uuid
+      responses:
+        "200":
+          description: ok
+          content:
+            image/jpeg:
+              schema:
+                type: "string"
+                format: binary
+            image/png:
+              schema: 
+                type: "string"
+                format: binary
+        "404":
+          description: image not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FailResponse"
+    delete:
+      summary: "delete image"
+      tags:
+        - images
+      parameters:
+        - in: "path"
+          name: "imageId"
+          description: "id of image to download"
+          required: true
+          schema:
+            type: "string"
+            format: uuid
+      responses:
+        "200":
+          description: ok
+        "404":
+            description: image not found
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/FailResponse"
+                  
+  /images/{imageId}/meta:
+    get:
+      tags:
+        - images
+      summary: "get image metadata"
+      parameters:
+        - in: "path"
+          name: "imageId"
+          description: "id of image to get metadata of"
+          required: true
+          schema:
+            type: "string"
+            format: uuid
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageMetadata"
+        "404":
+          description: image not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FailResponse"
+  
+
+components:
+  schemas:
+    Flat:
+      type: "object"
+      required:
+        - id
+        - name
+        - squareMeters
+        - nrOfRooms
+        - photos
+        - location
+      properties:
+        id:
+          type: "integer"
+        name:
+          type: "string"
+          minLength: 3
+        squareMeters:
+          type: "integer"
+          minimum: 0
+        nrOfRooms:
+          type: "integer"
+          minimum: 0
+        maxNrOfGuests:
+          type: "integer"
+          minimum: 0
+        price:
+          type: "number"
+          example: 155.45
+          description: decimal number (will be rounded to two decimal places)
+        photos:
+          type: array
+          items:
+            type: string
+            description: Urls
+        location:
+          type: string
+
+    Booking:
+      type: "object"
+      required:
+        - id
+        - flat
+        - from
+        - to
+        - active
+        - customer
+      properties:
+        id:
+          type: "integer"
+        flat:
+          type: "integer"
+        from:
+          type: "string"
+          format: "datetime"
+        to:
+          type: "string"
+          format: "datetime"
+        active:
+          type: "boolean"
+          default: true
+          description: Whether or not the booking is still active (false means it was cancelled)
+        customer:
+          type: string
+          description: Name of the customer
+          
+    User:
+      type: "object"
+      required:
+        - username
+        - password
+        - authorities
+      properties:
+        id:
+          type: "integer"
+        username:
+          type: "string"
+        password:
+          type: "string"
+        enabled:
+          type: "boolean"
+        authorities:
+          type: "array"
+          items: 
+            type: "string"
+            
+    ImageMetadata:
+      type: "object"
+      properties:
+        fileId:
+          type: "string"
+          format: uuid
+        fileName:
+          type: "string"
+        type:
+          type: "string"
+          description: mime type of the image
+        creationTimestamp:
+          type: "integer"
+        fileSize:
+          type: "integer"
+        filePath:
+          type: "string"
+          example: "/api/files/3fa85f64-5717-4562-b3fc-2c963f66afa6"
+
+    FailResponse:
+      type: "object"
+      properties:
+        message:
+          type: "string"
