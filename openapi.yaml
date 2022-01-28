@@ -6,18 +6,18 @@ info:
   contact:
     url: https://github.com/pwmini2021/flatly
 
-host: "https://spring-app-lab.azurewebsites.net"
-basePath: "/api"
+servers:
+  - url: https://spring-app-lab.azurewebsites.net/api
+
+security:
+  - bearerAuth: []
+
 tags:
   - name: "flat"
     description: "Everything about flats"
 
   - name: "booking"
     description: "Bookings of flats"
-
-schemes:
-  - "https"
-  - "http"
 
 paths:
   /auth:
@@ -38,7 +38,7 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-                      
+
     post:
       tags:
         - security
@@ -262,7 +262,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FailResponse"
-                
+
   /images:
     post:
       tags:
@@ -285,7 +285,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ImageMetadata"
-                
+
   /images/{imageId}:
     get:
       tags:
@@ -308,7 +308,7 @@ paths:
                 type: "string"
                 format: binary
             image/png:
-              schema: 
+              schema:
                 type: "string"
                 format: binary
         "404":
@@ -333,12 +333,12 @@ paths:
         "200":
           description: ok
         "404":
-            description: image not found
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/FailResponse"
-                  
+          description: image not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FailResponse"
+
   /images/{imageId}/meta:
     get:
       tags:
@@ -365,17 +365,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FailResponse"
-  
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Flat:
       type: "object"
       required:
         - id
         - name
-        - squareMeters
-        - nrOfRooms
+        - floorSpace
+        - rooms
+        - maxGuests
         - photos
         - location
       properties:
@@ -384,19 +390,20 @@ components:
         name:
           type: "string"
           minLength: 3
-        squareMeters:
+        floorSpace:
+          type: "integer"
+          description: In square meters
+          minimum: 0
+        rooms:
           type: "integer"
           minimum: 0
-        nrOfRooms:
-          type: "integer"
-          minimum: 0
-        maxNrOfGuests:
+        maxGuests:
           type: "integer"
           minimum: 0
         price:
           type: "number"
           example: 155.45
-          description: decimal number (will be rounded to two decimal places)
+          description: Decimal number (will be rounded to two decimal places)
         photos:
           type: array
           items:
@@ -432,7 +439,7 @@ components:
         customer:
           type: string
           description: Name of the customer
-          
+
     User:
       type: "object"
       required:
@@ -450,9 +457,9 @@ components:
           type: "boolean"
         authorities:
           type: "array"
-          items: 
+          items:
             type: "string"
-            
+
     ImageMetadata:
       type: "object"
       properties:
