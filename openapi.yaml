@@ -455,10 +455,10 @@ components:
           type: "integer"
         flat:
           type: "integer"
-        from:
+        bookedFrom:
           type: "string"
           format: "datetime"
-        to:
+        bookedTo:
           type: "string"
           format: "datetime"
         active:
