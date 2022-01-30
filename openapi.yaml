@@ -42,6 +42,17 @@ paths:
     post:
       tags:
         - security
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
       responses:
         "200":
           description: OK
@@ -179,6 +190,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FailResponse"
+  /flats/{flatId}/bookings:
+    get:
+      tags:
+        - flat
+      summary: "Get bookings of a flat"
+      parameters:
+        - in: "path"
+          name: "flatId"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
 
   /bookings:
     get:
